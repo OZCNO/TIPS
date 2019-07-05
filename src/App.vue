@@ -1,28 +1,77 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+	<div id="app">
+		<el-container>
+			<el-header>
+      <el-row>
+        <el-col :span="4">
+          <div class="logo"><span>广州银行自助缴税服务系统</span></div>
+        </el-col>
+        <el-col :span="20">
+          <div class="menu">
+            <el-menu
+              :default-active="activeIndex"
+              mode="horizontal"
+              @select="handleSelect"
+              background-color="#545c64"
+              text-color="#fff"
+              active-text-color="#ffd04b"
+              >
+              <el-menu-item index="/page1">应缴税收</el-menu-item>
+              <el-menu-item index="/page2">个税计算</el-menu-item>
+              <el-menu-item index="/page3">问题反馈</el-menu-item>
+            </el-menu>
+          </div>
+        </el-col>
+      </el-row>
+      </el-header>
+      <el-main>
+        <el-col :span="24">
+          <transition name="fade" mode="out-in">
+            <router-view></router-view>
+          </transition>
+        </el-col>
+      </el-main>
+		</el-container>
+	</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
+	name: 'app',
+  data() {
+      return {
+        activeIndex: '/page1',
+      };
+    },
+    created:function(){
+      // console.log(this.$router.params);
+    },
+    methods: {
+      handleSelect(key, keyPath) {
+        this.$router.push(key);
+        // console.log(key, keyPath);
+      }
+    }
 }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+*{
+	padding:0;
+	margin:0;
+}
+.el-header{
+	background-color: #545c64;
+	color: #fff;
+	line-height: 60px;
+  font-size:22px;
+}
+.logo{
+  border-right-width:1px;
+  border-right-style:solid;
+  border-color:hsla(62,77%,76%,.3);
+  width:280px;
+}
+.el-main {
 }
 </style>
