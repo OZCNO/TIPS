@@ -3,24 +3,22 @@
 		<el-container>
 			<el-header>
       <el-row>
-        <el-col :span="4">
+        <el-col :span="6">
           <div class="logo"><span>广州银行自助缴税服务系统</span></div>
         </el-col>
-        <el-col :span="20">
-          <div class="menu">
-            <el-menu
-              :default-active="activeIndex"
-              mode="horizontal"
-              @select="handleSelect"
-              background-color="#545c64"
-              text-color="#fff"
-              active-text-color="#ffd04b"
-              >
-              <el-menu-item index="/page1">应缴税收</el-menu-item>
-              <el-menu-item index="/page2">个税计算</el-menu-item>
-              <el-menu-item index="/page3">问题反馈</el-menu-item>
-            </el-menu>
-          </div>
+        <el-col :span="18">
+          <el-menu
+            router
+            :default-active="activeIndex"
+            mode="horizontal"
+            background-color="#545c64"
+            text-color="#fff"
+            active-text-color="#ffd04b"
+            >
+            <el-menu-item index="/page1">应缴税收</el-menu-item>
+            <!-- <el-menu-item index="/page2">个税计算</el-menu-item> -->
+            <el-menu-item index="/page3">问题反馈</el-menu-item>
+          </el-menu>
         </el-col>
       </el-row>
       </el-header>
@@ -44,13 +42,13 @@ export default {
       };
     },
     created:function(){
-      // console.log(this.$router.params);
+      this.$router.push("/page1");
     },
     methods: {
-      handleSelect(key, keyPath) {
-        this.$router.push(key);
+      // handleSelect(key, keyPath) {
+        // this.$router.push(key);
         // console.log(key, keyPath);
-      }
+      // }
     }
 }
 </script>
@@ -70,7 +68,7 @@ export default {
   border-right-width:1px;
   border-right-style:solid;
   border-color:hsla(62,77%,76%,.3);
-  width:280px;
+  width:285px;
 }
 .el-main {
 }
