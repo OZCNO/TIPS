@@ -3,10 +3,10 @@
 		<el-container>
 			<el-header>
       <el-row>
-        <el-col :span="6">
+        <el-col :span="4">
           <div class="logo"><span>广州银行自助缴税服务系统</span></div>
         </el-col>
-        <el-col :span="18">
+        <el-col :span="20">
           <el-menu
             router
             :default-active="activeIndex"

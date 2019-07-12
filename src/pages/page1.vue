@@ -5,20 +5,20 @@
         <span>申报扣税</span>
       </div>
       <el-form ref="form" :inline="true" size="mini" :model="form" label-width="96px">
-        <el-form-item label="征收机关代码" prop="txcode">
-          <el-input v-model="form.txcode"></el-input>
+        <el-form-item label="征收机关代码" prop="collectingoffice">
+          <el-input v-model="form.collectingoffice"></el-input>
         </el-form-item>
-        <el-form-item label="纳税人编码" prop="rxutid">
-          <el-input v-model="form.rxutid"></el-input>
+        <el-form-item label="纳税人编码" prop="taxpayer">
+          <el-input v-model="form.taxpayer"></el-input>
         </el-form-item>
-        <el-form-item label="申报序号" prop="tipssq">
-          <el-input v-model="form.tipssq"></el-input>
+        <el-form-item label="申报序号" prop="declarationid">
+          <el-input v-model="form.declarationid"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button  size="mini" @click="handleGetTax">查询</el-button>
         </el-form-item>
       </el-form>
-      <el-form ref="resultForm" :inline="true" size="mini" :model="resultForm" label-width="96px">
+      <!-- <el-form ref="resultForm" :inline="true" size="mini" :model="resultForm" label-width="96px">
         <el-form-item label="征收机关名称">
           <el-input v-model="resultForm.txname" disabled></el-input>
         </el-form-item>
@@ -28,28 +28,30 @@
         <el-form-item label="总金额">
           <el-input v-model="resultForm.tAmount" disabled></el-input>
         </el-form-item>
-      </el-form>
+      </el-form> -->
 
       <el-table :data="list" :highlight-current-row="true" v-loading="listLoading" style="width: 100%" class="tableClass" size="mini">
         <el-table-column type="index" width="70px" label="项目序号">
-        </el-table-column><el-table-column prop="id" label="税种代码" sortable show-overflow-tooltip> 
-        </el-table-column><el-table-column prop="name" label="税种名称" sortable show-overflow-tooltip>
-        </el-table-column><el-table-column prop="beginTime" label="税款所属日期起" sortable>
-        </el-table-column><el-table-column prop="overTime" label="税款所属日期止" sortable>
-        </el-table-column><el-table-column prop="type" label="税款类型" sortable>
-        </el-table-column><el-table-column prop="amount" label="税款数" sortable>
+        </el-table-column><el-table-column prop="proofid" label="凭证序号" sortable show-overflow-tooltip>
+        </el-table-column><el-table-column prop="prooftype" label="凭证种类" sortable show-overflow-tooltip>
+        </el-table-column><el-table-column prop="project" label="征收项目" sortable>
+        </el-table-column><el-table-column prop="item" label="征收品目" sortable>
+        </el-table-column><el-table-column prop="taxvalue" label="税额" sortable>
+        </el-table-column><el-table-column prop="generationdate" label="所属日期 " sortable>
+        </el-table-column><el-table-column prop="closingdate" label="截止日期 " sortable>
+        </el-table-column><el-table-column prop="durationpayment" label="缴款日期 " sortable>
         </el-table-column>
       </el-table>
       <el-col :span="24" class="toolbar">
         <el-button  @click="dialogFormVisible=true" size="mini">发起扣税</el-button>
-        <el-pagination
+        <!-- <el-pagination
           background
           small
           layout="prev, pager, next"
           @current-change="handleCurrentChange"
-          :page-size="5"  
+          :page-size="5"
           :total="total" style="float:right">
-        </el-pagination>
+        </el-pagination> -->
       </el-col>
     </el-card>
 
@@ -73,24 +75,22 @@
 </template>
 
 <script>
-// import { getList,taxStatus,test } from "../api.js";
-import { getList } from "../api.js";
-import { taxStatus } from "../api.js";
+import { getList,taxStatus,test } from "../api.js";
 export default {
   name: 'page1',
   data() {
     return {
       activeName: 'first',
       form:{
-          "txcode":"",
-          "rxutid":"",
-          "tipssq":"",
+          "collectingoffice":"",
+          "taxpayer":"",
+          "declarationid":"",
       },
-      resultForm:{},
+      // resultForm:{},
       listLoading:false,
       list:[],
-      page:1,
-      total:0,
+      // page:1,
+      // total:0,
       dialogFormVisible:false,
       payForm:{
         "pyerac":"",
@@ -99,53 +99,81 @@ export default {
       submitting:false,
     }
   },
+  create(){
+  },
   methods: {
     handleGetTax(){
-      this.listLoading=true
-      // 暂时不传递数据
-      // 把请求的页码输进去
-      getList().then(res=>{
-      // getList(this.form).then(res=>{
+      console.log("test connect")
+      let p={
+        "a":"1"
+      }
+      test(p).then(res=>{
         console.log(res)
-        let {msg,code,data}=res.data
-        if(code==200){
-          this.list=data.list
-          this.total=data.totalCount
-          this.resultForm=data.form
-        }else{
-          this.$message.error(msg)
-        }
-        this.listLoading=false
-      }).catch(res=>{
-        this.listLoading=false
-        this.$message.error(msg)
       })
+
+      // this.listLoading=true
+      // // 把请求的页码输进去
+      // // 暂时不传递数据
+      // console.log("123");
+      // let params={
+      //   "data":{
+      //     "protoId": "2091",
+      //     "declarationInfo":{
+      //       "collectingoffice":this.form.collectingoffice,
+      //       "taxpayer":this.form.taxpayer,
+      //       "declarationid" :this.form.declarationid
+      //     }
+      //   }
+      // }
+      // let test={
+      //   "p":1,
+      //   "q":10
+      // }
+      // // getList(test).then(res=>{
+      // getList(params).then(res=>{
+      //   console.log(res);
+      //   let {msg,code,data}=res.data
+      //   if(code==200){
+      //     this.list=data.list
+      //     // this.total=data.totalCount
+      //     // this.resultForm=data.form
+      //   }else{
+      //     this.$message.error(msg)
+      //   }
+      //   this.listLoading=false
+      // })
     },
-    handleCurrentChange(val){
-      this.page=val
-      // this.handleGetTax()
-    },
+    // handleCurrentChange(val){
+    //   this.page=val
+    // },
     handleCancel(form){
       this.resetForm(form)
       this.dialogFormVisible=false
     },
     resetForm(form){
-      this.$refs[form].resetFields()      
+      this.$refs[form].resetFields()
     },
     submitForm(form){
+      let params={
+        "data":{
+          "protoId":"2090"
+        }
+      }
       this.submitting = true
-      taxStatus().then(res=>{
+      taxStatus(params).then(res=>{
+        // console.log(res)
         let {msg,code,data}=res.data
+        // let data=res.data.data
         if(code==200){
           this.submitting=false
           this.$message.success("缴税成功")
           this.resetForm("form")
-          this.resultForm={}
+          // this.resultForm={}
           this.resetForm(form)
           this.dialogFormVisible = false
           //清空列表
           this.list=[]
-          this.total=0
+        //   this.total=0
         }else{
           this.submitting=false
           this.$message.error(msg)

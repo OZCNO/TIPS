@@ -1,61 +1,45 @@
 var Mock = require('mockjs');
 var list = [
     {
-      "id":"233",
-      "name":"32",
-      "beginTime":"1999.12.2",
-      "overTime":"1999.12.29",
-      "type":"23",
-      'amount':"131"
-    },{
-      'id':"233",
-      'name':"32",
-      'beginTime':"1999.12.2",
-      'overTime':"1999.12.29",
-      'type':"23",
-      'amount':"131"
+      "proofid":"233",
+      "prooftype":"32",
+      "project":"dsfdsf",
+      "item":"1gdsfsd",
+      "taxvalue":"23",
+      'generationdate':"1999.11.1",
+      "closingdate":"1999.12.2",
+      "durationpayment":"1999.12.1",
     },
     {
-      "id":"233",
-      "name":"32",
-      "beginTime":"1999.12.2",
-      "overTime":"1999.12.29",
-      "type":"23",
-      'amount':"131"
-    },{
-      'id':"233",
-      'name':"32",
-      'beginTime':"1999.12.2",
-      'overTime':"1999.12.29",
-      'type':"23",
-      'amount':"131"
-    },
-    {
-      "id":"233",
-      "name":"32",
-      "beginTime":"1999.12.2",
-      "overTime":"1999.12.29",
-      "type":"23",
-      'amount':"131"
+      "proofid":"233",
+      "prooftype":"32",
+      "project":"dsfdsf",
+      "item":"1gdsfsd",
+      "taxvalue":"23",
+      'generationdate':"1999.11.1",
+      "closingdate":"1999.12.2",
+      "durationpayment":"1999.12.1",
     }
 ];
-Mock.mock("http://127.0.0.1:8083/list",function(data){
+Mock.mock("http://127.0.0.1:8083/TipsServer/checkTax",function(data){
+  console.log(1);
+  console.log(data)
   let result={
     "code":200,
     "msg":"success",
     "data":{
-      "totalCount":10,
-      "form":{
-        "txname":"呵呵呵呵",
-        "tCount":"10",
-        "tAmount":"13153" 
-      },
+      // "totalCount":10,
+      // "form":{
+      //   "txname":"呵呵呵呵",
+      //   "tCount":"10",
+      //   "tAmount":"13153"
+      // },
       "list":list,
+      }
     }
-  }
-  return result
+    return result
 });
-Mock.mock("http://127.0.0.1:8083/tax",function(data){
+Mock.mock("http://127.0.0.1:8083/payTax",function(data){
   console.log(data.body);
   let result={
     "code":200,
