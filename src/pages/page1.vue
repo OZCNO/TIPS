@@ -44,6 +44,7 @@
       </el-table>
       <el-col :span="24" class="toolbar">
         <el-button  @click="dialogFormVisible=true" size="mini">发起扣税</el-button>
+        <el-button  @click="nodeTest" size="mini">node测试</el-button>
         <!-- <el-pagination
           background
           small
@@ -75,7 +76,7 @@
 </template>
 
 <script>
-import { getList,taxStatus,test } from "../api.js";
+import { getList,taxStatus,save,check } from "../api.js";
 export default {
   name: 'page1',
   data() {
@@ -102,46 +103,98 @@ export default {
   create(){
   },
   methods: {
-    handleGetTax(){
-      console.log("test connect")
-      let p={
-        "a":"1"
+    nodeTest(){
+      let date=new Date();
+      let s2091={
+        "data":{
+          "protoId": "2091", //4个id
+          "data":{
+            "fcbpdt": "nodetest",
+            "fcbpsq": "nodetest",
+            "tipssq": "nodetest",
+            "tranam": "nodetest",
+            "pyerac": "nodetest",
+            "pyerna": "nodetest",
+            "txcode": "nodetest",
+            "txutid": "nodetest",
+          }
+        }
       }
-      test(p).then(res=>{
-        console.log(res)
+      check().then(res=>{
+        console.log(res);
+      })
+    },
+    handleGetTax(){
+      let date=new Date();
+      //
+      let s2091={
+        "data":{
+          "protoId": "2091", //4个id
+          "data":{
+            "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
+            "fcbpsq": "",//流水
+            "tipssq": this.form.declarationid,//申报序号
+            "tranam": "",//金额
+            "pyerac": "",//账户
+            "pyerna": "",//名称
+            "txcode": this.form.collectingoffice,//机关编码
+            "txutid": this.form.taxpayer,//纳税人编码
+          }
+        }
+      }
+      save(s2091).then(res=>{
+        let {code,msg,data}=res.data
+          if(code==200){
+            console.log("2091数据库记录成功")
+          }
       })
 
-      // this.listLoading=true
-      // // 把请求的页码输进去
-      // // 暂时不传递数据
-      // console.log("123");
-      // let params={
-      //   "data":{
-      //     "protoId": "2091",
-      //     "declarationInfo":{
-      //       "collectingoffice":this.form.collectingoffice,
-      //       "taxpayer":this.form.taxpayer,
-      //       "declarationid" :this.form.declarationid
-      //     }
-      //   }
-      // }
-      // let test={
-      //   "p":1,
-      //   "q":10
-      // }
-      // // getList(test).then(res=>{
-      // getList(params).then(res=>{
-      //   console.log(res);
-      //   let {msg,code,data}=res.data
-      //   if(code==200){
-      //     this.list=data.list
-      //     // this.total=data.totalCount
-      //     // this.resultForm=data.form
-      //   }else{
-      //     this.$message.error(msg)
-      //   }
-      //   this.listLoading=false
-      // })
+      let params={
+        "data":{
+          "protoId": "2091",
+          "declarationInfo":{
+            "collectingoffice":this.form.collectingoffice,
+            "taxpayer":this.form.taxpayer,
+            "declarationid" :this.form.declarationid
+          }
+        }
+      }
+      this.listLoading=true
+
+      getList(params).then(res=>{
+        let {msg,code,list}=res.data
+        if(code==200){
+          this.list=list
+          // this.total=data.totalCount
+          // this.resultForm=data.form
+          // 录入数据库
+          let s1009={
+            "data":{
+              "protoId": "1009", //4个id
+              "data":{
+                "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
+                "fcbpsq": "",
+                "tipssq": this.form.declarationid,
+                "tranam": list.taxvalue,
+                "pyerac": "",//账户
+                "pyerna": "",//名称
+                "txcode": this.form.collectingoffice,//机关编码
+                "txutid": this.form.taxpayer,//纳税人编码
+              }
+            }
+          }
+          save(s1009).then(res=>{
+            let {code,msg,data}=res.data
+            if(code==200){
+              console.log("1009数据库记录成功")
+            }
+          })
+
+        }else{
+          this.$message.error(msg)
+        }
+        this.listLoading=false
+      })
     },
     // handleCurrentChange(val){
     //   this.page=val
@@ -154,14 +207,41 @@ export default {
       this.$refs[form].resetFields()
     },
     submitForm(form){
+      let date=new Date();
+      //
+      let s2090={
+        "data":{
+          "protoId": "2090", //4个id
+          "data":{
+            "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
+            "fcbpsq": "",
+            "tipssq": this.form.declarationid,
+            "tranam": this.list.taxvalue,
+            "pyerac": this.list.taxvalue,//账户
+            "pyerna": "",//名称
+            "txcode": this.form.collectingoffice,//机关编码
+            "txutid": this.form.taxpayer,//纳税人编码
+          }
+        }
+      }
+      save(s2090).then(res=>{
+        let {code,msg,data}=res.data
+        if(code==200){
+          console.log("2090数据库记录成功")
+        }
+      })
+      //
       let params={
         "data":{
-          "protoId":"2090"
+          "protoId": "2090",
+          "personaldt":{
+              "pyerac": "",
+              "pypsd": "",
+          }
         }
       }
       this.submitting = true
       taxStatus(params).then(res=>{
-        // console.log(res)
         let {msg,code,data}=res.data
         // let data=res.data.data
         if(code==200){
@@ -173,7 +253,29 @@ export default {
           this.dialogFormVisible = false
           //清空列表
           this.list=[]
-        //   this.total=0
+          //this.total=0
+          //录入数据库
+          let s1008={
+            "data":{
+              "protoId": "1008", //4个id
+              "data":{
+                "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
+                "fcbpsq": "",
+                "tipssq": this.form.declarationid,
+                "tranam": this.list.taxvalue,
+                "pyerac": this.list.taxvalue,//账户
+                "pyerna": "",//名称
+                "txcode": this.form.collectingoffice,//机关编码
+                "txutid": this.form.taxpayer,//纳税人编码
+              }
+            }
+          }
+          save(s1008).then(res=>{
+            let {code,msg,data}=res.data
+            if(code==200){
+              console.log("1008数据库记录成功")
+            }
+          })
         }else{
           this.submitting=false
           this.$message.error(msg)

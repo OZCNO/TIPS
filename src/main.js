@@ -11,7 +11,7 @@ Vue.use(VueRouter);
 import page1 from "./pages/page1.vue";
 import page3 from "./pages/page3.vue";
 
-import "./mock.js"
+// import "./mock.js"
 import axios from 'axios'
 
 Vue.config.productionTip = false;

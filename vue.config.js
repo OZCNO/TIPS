@@ -1,20 +1,40 @@
 module.exports = {
   // 基本路径
-  baseUrl: './',
+  publicPath: './',
   // 输出文件目录
   outputDir: 'dist',
   // webpack-dev-server 相关配置
   devServer: {
-    port: 8888,
+    // port: 8080,
     proxy:{
-      "/api":{
-        target:"http://localhost:8888",
+      //当服务器遇到以/bank开头的，就会在前面加上target
+      "/bank":{
+        target:"http://10.1.253.19:8090/DBServer1",
         changeOrigin:true,//允许跨域
         secure:false,
         ws:false,
         pathRewrite:{
-          "^/api":"/api"
+          "^/bank":""//把bank替换为空，
         }
+      },
+      "/tax":{
+        target:"http://10.1.253.19:8080/TipsServer",
+        changeOrigin:true,//允许跨域
+        secure:false,
+        ws:false,
+        pathRewrite:{
+          "^/tax":""
+        }
+      },
+      "node":{
+        target:"http://127.0.0.1:8888/node",
+        changeOrigin:true,//允许跨域
+        secure:false,
+        ws:false,
+        pathRewrite:{
+          "^/node":"/node"
+        }
+
       }
     }
   },
