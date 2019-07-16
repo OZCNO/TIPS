@@ -26,15 +26,11 @@ module.exports = {
           "^/tax":""
         }
       },
-      "node":{
-        target:"http://127.0.0.1:8888/node",
+      "/node":{
+        target:"http://127.0.0.1:8888",
         changeOrigin:true,//允许跨域
         secure:false,
-        ws:false,
-        pathRewrite:{
-          "^/node":"/node"
-        }
-
+        ws:false
       }
     }
   },
