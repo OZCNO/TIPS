@@ -1,53 +1,61 @@
-<template>
-  <div>
-    <!-- <el-col :span="18" :offset="3"> -->
-      <el-card class="box-card">
-        <div slot="header" class="clearfix">
-          <span>申报扣税</span>
-        </div>
-        <el-form ref="form" :inline="true" size="medium" :model="form" label-width="110px" :rules="formRules">
-          <el-form-item label="征收机关代码" prop="collectingoffice">
-            <el-input v-model="form.collectingoffice"></el-input>
-          </el-form-item>
-          <el-form-item label="纳税人编码" prop="taxpayer">
-            <el-input v-model="form.taxpayer"></el-input>
-          </el-form-item>
-          <el-form-item label="申报序号" prop="declarationid">
-            <el-input v-model="form.declarationid"></el-input>
-          </el-form-item>
-          <el-form-item style="margin-left:20px">
-            <el-button  size="medium" @click="handleGetTax('form')" type="primary">查询</el-button>
-          </el-form-item>
-        </el-form>
-        <el-form ref="resultForm" :inline="true" size="medium" :model="resultForm" label-width="110px">
-          <el-form-item label="征收机关名称">
-            <el-input v-model="resultForm.txname" disabled></el-input>
-          </el-form-item>
-          <el-form-item label="总笔数">
-            <el-input v-model="resultForm.tCount" disabled></el-input>
-          </el-form-item>
-          <el-form-item label="总金额">
-            <el-input v-model="resultForm.tAmount" disabled></el-input>
-          </el-form-item>
-        </el-form>
-
-        <el-table :data="list" :highlight-current-row="true" v-loading="listLoading" style="width: 100%" class="tableClass" size="medium">
-          <el-table-column type="index" width="80px" label="序号">
-          </el-table-column><el-table-column prop="proofid" label="明细序号" sortable show-overflow-tooltip>
-          </el-table-column><el-table-column prop="prooftype" label="凭证种类" sortable show-overflow-tooltip>
-          </el-table-column><el-table-column prop="project" label="征收项目" sortable>
-          </el-table-column><el-table-column prop="item" label="征收品目" sortable>
-          </el-table-column><el-table-column prop="taxvalue" label="税额" sortable>
-          </el-table-column><el-table-column prop="generationdate" label="所属日期 " sortable>
-          </el-table-column><el-table-column prop="closingdate" label="截止日期 " sortable>
-          </el-table-column><el-table-column prop="durationpayment" label="缴款日期 " sortable>
-          </el-table-column>
-        </el-table>
-        <el-col :span="24" class="toolbar">
-          <el-button  @click="handleSubmit" size="medium" type="primary">发起扣税</el-button>
-        </el-col>
-      </el-card>
-    <!-- </el-col> -->
+<template id="v2">
+<el-container>
+  <el-header style="padding:0;height:80px;">
+    <div class="logo">
+      <img src="../assets/logo.png"/>
+      <span class="name">银行端缴税系统</span>
+    </div>
+  </el-header>
+  <el-main>
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <span>申报扣税</span>
+      </div>
+      <el-form ref="form" :inline="true" size="medium" :model="form" label-width="110px" :rules="formRules" label-position="left">
+        <el-form-item label="征收机关代码" prop="collectingoffice">
+          <el-input v-model="form.collectingoffice"></el-input>
+        </el-form-item>
+        <el-form-item label="征收机关名称">
+          <el-input v-model="resultForm.txname" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="纳税人编码" prop="taxpayer">
+          <el-input v-model="form.taxpayer"></el-input>
+        </el-form-item>
+        <el-form-item label="申报序号" prop="declarationid">
+          <el-input v-model="form.declarationid"></el-input>
+        </el-form-item>
+        <el-form-item style="margin-left:20px">
+          <el-button  size="medium" @click="handleGetTax('form')" type="primary">查 询</el-button>
+        </el-form-item>
+      </el-form>
+      <br>
+      <el-table :data="list" :highlight-current-row="true" v-loading="listLoading" style="width: 100%" class="tableClass" size="medium">
+        <el-table-column type="index" width="80px" label="序号">
+        </el-table-column><el-table-column prop="proofid" label="明细序号" sortable show-overflow-tooltip>
+        </el-table-column><el-table-column prop="prooftype" label="凭证种类" sortable show-overflow-tooltip>
+        </el-table-column><el-table-column prop="project" label="征收项目" sortable>
+        </el-table-column><el-table-column prop="item" label="征收品目" sortable>
+        </el-table-column><el-table-column prop="taxvalue" label="税额" sortable>
+        </el-table-column><el-table-column prop="generationdate" label="所属日期 " sortable>
+        </el-table-column><el-table-column prop="closingdate" label="截止日期 " sortable>
+        </el-table-column><el-table-column prop="durationpayment" label="缴款日期 " sortable>
+        </el-table-column>
+      </el-table>
+      <br>
+      <el-form ref="resultForm" :inline="true" size="medium" :model="resultForm" label-width="110px" label-position="left">
+        <el-form-item label=" 总笔数 ">
+          <el-input v-model="resultForm.tCount" disabled></el-input>
+        </el-form-item>
+        <el-form-item label=" 总金额 ">
+          <el-input v-model="resultForm.tAmount" disabled></el-input>
+        </el-form-item>
+        <el-form-item style="margin-left:20px">
+          <el-button  @click="handleSubmit" size="medium" type="primary">缴 税</el-button>
+        </el-form-item>
+      </el-form>
+      <!-- <el-col :span="24" class="toolbar">
+      </el-col> -->
+    </el-card>
     <el-dialog title="发起扣税" :visible.sync="dialogFormVisible" @close="handleCancel('payForm')">
       <el-form ref="payForm" :model="payForm" label-width="96px" :disabled="submitting" :rules="rules">
         <el-form-item label="付款账号" prop="pyerac">
@@ -63,13 +71,17 @@
           <el-button @click="submitForm('payForm')" :loading="submitting" type="primary">确定</el-button>
       </div>
     </el-dialog>
-  </div>
+  </el-main>
+  <el-footer>
+    <span>版权所有：广州银行&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 客户服务电话：96699（广东）、400-83-96699（全国）&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;地址：广州市天河区珠江东路30号广州银行大厦&nbsp;&nbsp;&nbsp;</span>
+    <router-link to='/v1' class="item">版本1</router-link>
+  </el-footer>
+</el-container>
 </template>
-
 <script>
 import { getList,taxStatus,save,check } from "../api.js";
 export default {
-  name: 'page1',
+  name: 'v2',
   data() {
     return {
       activeName: 'first',
@@ -313,5 +325,4 @@ export default {
   }
 }
 </script>
-
-<style  src="./../style/page1.css"></style>
+<style lang="scss" rel="stylesheet/scss" src="./../style/v2.scss"></style>
