@@ -1,5 +1,5 @@
 <template id="v1">
-<el-container>
+<el-container class="v1">
   <el-header class="header" style="padding:0">
       <div class="logo"><span>广州银行自助缴税服务系统</span></div>
       <div class="menu">

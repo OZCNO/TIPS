@@ -1,5 +1,5 @@
 <template id="v2">
-<el-container>
+<el-container class="v2">
   <el-header style="padding:0;height:80px;">
     <div class="logo">
       <img src="../assets/logo.png"/>
@@ -12,13 +12,13 @@
         <span>申报扣税</span>
       </div>
       <el-form ref="form" :inline="true" size="medium" :model="form" label-width="110px" :rules="formRules" label-position="left">
-        <el-form-item label="征收机关代码" prop="collectingoffice">
-          <el-input v-model="form.collectingoffice"></el-input>
+        <el-form-item label="征收机关代码" prop="collectingoffice" style="marginRight:80px">
+          <el-input v-model="form.collectingoffice"  v-on:keyup.enter.native="handleGetName(form.collectingoffice)"></el-input>
         </el-form-item>
-        <el-form-item label="征收机关名称">
-          <el-input v-model="resultForm.txname" disabled></el-input>
+        <el-form-item label="征收机关名称" prop="txname">
+          <el-input v-model="form.txname" disabled style="width:305px"></el-input>
         </el-form-item>
-        <el-form-item label="纳税人编码" prop="taxpayer">
+        <el-form-item label="纳税人编码" prop="taxpayer" style="marginRight:80px">
           <el-input v-model="form.taxpayer"></el-input>
         </el-form-item>
         <el-form-item label="申报序号" prop="declarationid">
@@ -42,12 +42,12 @@
         </el-table-column>
       </el-table>
       <br>
-      <el-form ref="resultForm" :inline="true" size="medium" :model="resultForm" label-width="110px" label-position="left">
-        <el-form-item label=" 总笔数 ">
-          <el-input v-model="resultForm.tCount" disabled></el-input>
+      <el-form :inline="true" size="medium" label-width="110px" label-position="left">
+        <el-form-item label=" 总笔数 " style="marginRight:80px">
+          <el-input v-model="totalCount" disabled></el-input>
         </el-form-item>
         <el-form-item label=" 总金额 ">
-          <el-input v-model="resultForm.tAmount" disabled></el-input>
+          <el-input v-model="totalAmount" disabled></el-input>
         </el-form-item>
         <el-form-item style="margin-left:20px">
           <el-button  @click="handleSubmit" size="medium" type="primary">缴 税</el-button>
@@ -59,10 +59,13 @@
     <el-dialog title="发起扣税" :visible.sync="dialogFormVisible" @close="handleCancel('payForm')">
       <el-form ref="payForm" :model="payForm" label-width="96px" :disabled="submitting" :rules="rules">
         <el-form-item label="付款账号" prop="pyerac">
-          <el-input type="text" v-model="payForm.pyerac"></el-input>
+          <el-input type="text" v-model="payForm.pyerac" v-on:keyup.enter.native="handleGetAccountName(payForm.pyerac)"></el-input>
         </el-form-item>
-        <el-form-item label="支付密码" prop="pypsd">
-          <el-input type="password" v-model="payForm.pypsd"></el-input>
+        <el-form-item label="账号名称" prop="accountName">
+          <el-input type="text" v-model="payForm.accountName" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="待扣税额">
+          <el-input type="text" v-model="totalAmount" disabled></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -79,45 +82,98 @@
 </el-container>
 </template>
 <script>
-import { getList,taxStatus,save,check } from "../api.js";
+import { getList,taxStatus,save,taxName,accountName,check } from "../api.js";
 export default {
   name: 'v2',
   data() {
     return {
-      activeName: 'first',
       form:{
           "collectingoffice":"",
           "taxpayer":"",
           "declarationid":"",
+          "txname":""
       },
       formRules:{
         collectingoffice:[{ required: true, message: '不能为空', trigger: 'blur'}],
         taxpayer:[{ required: true, message: '不能为空', trigger: 'blur'}],
-        declarationid:[{ required: true, message: '不能为空', trigger: 'blur'}]
+        declarationid:[{ required: true, message: '不能为空', trigger: 'blur'}],
+        txname:[{ required: true, message: '输入完征收机关代码后请按enter', trigger: 'blur'}]
+      },
+      payForm:{
+        "pyerac":"",
+        'accountName':""
       },
       rules:{
         pyerac:[{ required: true, message: '不能为空', trigger: 'blur'}],
-        pypsd:[{ required: true, message: '不能为空', trigger: 'blur'}]
+        accountName:[{ required: true, message: '输入完付款账号后请按enter', trigger: 'blur'}]
       },
-      resultForm:{},
       listLoading:false,
       list:[],
       dialogFormVisible:false,
-      payForm:{
-        "pyerac":"",
-        "pypsd":""
-      },
       submitting:false,
       t1008:false,
       t1009:false,
       t2090:false,
-      t2091:false
+      t2091:false,
     }
   },
   methods: {
+    handleGetAccountName(account){
+      console.log(account)
+      if(account==""){
+        this.payForm.accountName=""
+        return false
+      }
+      let params={
+        'data':{
+          'accountNo':account
+        }
+      }
+      accountName(params).then(res=>{
+        let {msg,code,accountName}=res.data
+        if(code==200){
+          this.payForm.accountName=accountName
+        }else if(code==202){
+          this.payForm.pyerac=""
+          this.payForm.accountName=""
+          this.$message.error("请输入正确的账号")
+        }else{
+          this.$message.error(code+" "+msg)
+        }
+      })
+    },
+    handleGetName(taxcode){
+      if(taxcode==""){
+        this.form.txname=""
+        return false;
+      }
+      let params={
+        'data':{
+          'collectingOffice':taxcode
+        }
+      }
+      taxName(params).then(res=>{
+        let {code,msg,collectingOfficeName}=res.data
+        if(code==200){
+          this.form.txname=collectingOfficeName
+        }else if(code==204){
+          this.$message.error("请输入正确的机关代码")
+          this.form.collectingoffice=""
+          this.form.txname=""
+        }else{
+          this.form.collectingoffice=""
+          this.form.txname=""
+          this.$message.error(code+" "+msg)
+        }
+      })
+    },
     handleGetTax(form){
       this.$refs[form].validate((valid) => {
         if (valid) {
+          if(this.form.txname==""){
+            console.log("enter")
+            this.form.txname=this.taxName
+          }
           this.handleT2091()
           let params={
             "data":{
@@ -131,7 +187,6 @@ export default {
             let {msg,code,list}=res.data
             if(code==200){
               this.list=list
-              // this.resultForm=data.form
               this.handleT1009()
             }else{
               this.$message.error(msg)
@@ -161,49 +216,47 @@ export default {
       this.$refs[form].resetFields()
     },
     submitForm(form){
-      this.handleT2090()
-      let params={
-        "data":{
-          "protoId": "2090",
-          "personaldt":{
-              "pyerac": "",
-              "pypsd": "",
+      this.$refs[form].validate((valid) => {
+        if (!valid) {
+          return false;
+        }
+        this.handleT2090()
+        let params={
+          "data":{
+            "protoId": "2090",
+            "personaldt":{
+                "pyerac": "",
+                "pypsd": "",
+            }
           }
         }
-      }
-      this.submitting = true
-      taxStatus(params).then(res=>{
-        let {msg,code,data}=res.data
-        if(code==200){
-          this.submitting=false
-          this.handleT1008()
+        this.submitting = true
+        taxStatus(params).then(res=>{
+          let {msg,code,data}=res.data
+          if(code==200){
+            this.submitting=false
+            this.handleT1008()
 
-          // console.log(this.t1008)
+            // console.log(this.t1008)
 
-          if(this.t1008){
-            this.$message.success("缴税成功")
-            this.resetForm("form")
-            this.resetForm(form)
-            // this.resultForm={}
-            this.dialogFormVisible = false
-            this.list=[]
-            t1008=false
-            t1009=false
-            t2090=false
-            t2091=false
+            // if(this.t1008){
+            //   this.$message.success("缴税成功")
+            //   this.resetForm("form")
+            //   this.resetForm(form)
+            //   // this.resultForm={}
+            //   this.dialogFormVisible = false
+            //   this.list=[]
+            //   this.t1008=false
+            //   this.t1009=false
+            //   this.t2090=false
+            //   this.t2091=false
+            // }
+          }else{
+            this.submitting=false
+            this.$message.error(msg)
           }
-        }else{
-          this.submitting=false
-          this.$message.error(msg)
-        }
+        })
       })
-    },
-    totalAmount(){
-      let res=0
-      this.list.forEach(function(item,index){
-        res+=item.taxvalue
-      })
-      return res
     },
     handleT2091(){
       let date=new Date();
@@ -247,7 +300,7 @@ export default {
             "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
             "fcbpsq": "",
             "tipssq": this.form.declarationid,
-            "tranam": this.totalAmount(),
+            "tranam": this.totalAmount,
             "pyerac": this.list.taxvalue,//账户
             "pyerna": "",//名称
             "txcode": this.form.collectingoffice,//机关编码
@@ -275,7 +328,7 @@ export default {
             "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
             "fcbpsq": "",
             "tipssq": this.form.declarationid,
-            "tranam": this.totalAmount(),
+            "tranam": this.totalAmount,
             "pyerac": this.list.taxvalue,//账户
             "pyerna": "",//名称
             "txcode": this.form.collectingoffice,//机关编码
@@ -303,11 +356,17 @@ export default {
             "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
             "fcbpsq": "",
             "tipssq": this.form.declarationid,
-            "tranam": this.totalAmount(),
+            "tranam": this.totalAmount,
             "pyerac": this.list.taxvalue,//账户
             "pyerna": "",//名称
             "txcode": this.form.collectingoffice,//机关编码
             "txutid": this.form.taxpayer,//纳税人编码
+          },
+          "cg200xpara":{
+            "declarationid":this.form.declarationid,
+            "accountname":this.payForm.accountName,
+            "accountid":this.payForm.pyerac,
+            "tranamount":this.totalAmount
           }
         }
       }
@@ -316,12 +375,42 @@ export default {
         if(code==200){
           this.t1008=true
           console.log("1008数据库记录成功")
+
+          if(this.t1008){
+            this.$message.success("缴税成功")
+            this.resetForm("form")
+            this.resetForm("payForm")
+            this.dialogFormVisible = false
+            this.list=[]
+            this.t1008=false
+            this.t1009=false
+            this.t2090=false
+            this.t2091=false
+          }
+
         }else{
           this.t1008=false
           this.$message.error("出错了")
         }
       })
     },
+  },
+  computed:{
+    totalAmount(){
+      let res=0
+      this.list.forEach(function(item,index){
+        res+=item.taxvalue
+      })
+      return res
+    },
+    totalCount(){
+      return this.list.length;
+    },
+    taxName(){
+      let p=this.form.collectingOffice
+      let res=this.handleGetName(p)
+      return res
+    }
   }
 }
 </script>
