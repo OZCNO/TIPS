@@ -237,8 +237,6 @@ export default {
             this.submitting=false
             this.handleT1008()
 
-            // console.log(this.t1008)
-
             // if(this.t1008){
             //   this.$message.success("缴税成功")
             //   this.resetForm("form")
@@ -396,6 +394,11 @@ export default {
     },
   },
   computed:{
+    // getName(){
+    //   let p=this.form.collectingOffice
+    //   let res=this.handleGetName(p)
+    //   return res
+    // },
     totalAmount(){
       let res=0
       this.list.forEach(function(item,index){
@@ -406,11 +409,6 @@ export default {
     totalCount(){
       return this.list.length;
     },
-    taxName(){
-      let p=this.form.collectingOffice
-      let res=this.handleGetName(p)
-      return res
-    }
   }
 }
 </script>
