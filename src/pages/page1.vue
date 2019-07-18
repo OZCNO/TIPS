@@ -58,7 +58,6 @@
         </el-form-item>
         <el-form-item label="待扣税额">
           <el-input type="text" v-model="totalAmount" disabled></el-input>
-        </el-form-item></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">
