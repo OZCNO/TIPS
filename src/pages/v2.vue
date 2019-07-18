@@ -13,7 +13,7 @@
       </div>
       <el-form ref="form" :inline="true" size="medium" :model="form" label-width="110px" :rules="formRules" label-position="left">
         <el-form-item label="征收机关代码" prop="collectingoffice" style="marginRight:80px">
-          <el-input v-model="form.collectingoffice"  v-on:keyup.enter.native="handleGetName(form.collectingoffice)"></el-input>
+          <el-input v-model="form.collectingoffice"  v-on:keyup.enter.native="handleGetTaxName(form.collectingoffice)" v-on:change="handleGetTaxName(form.collectingoffice)"></el-input>
         </el-form-item>
         <el-form-item label="征收机关名称" prop="txname">
           <el-input v-model="form.txname" disabled style="width:305px"></el-input>
@@ -22,7 +22,7 @@
           <el-input v-model="form.taxpayer"></el-input>
         </el-form-item>
         <el-form-item label="申报序号" prop="declarationid">
-          <el-input v-model="form.declarationid"></el-input>
+          <el-input v-model="form.declarationid" v-on:keyup.enter.native="handleGetTax('form')"></el-input>
         </el-form-item>
         <el-form-item style="margin-left:20px">
           <el-button  size="medium" @click="handleGetTax('form')" type="primary">查 询</el-button>
@@ -59,7 +59,7 @@
     <el-dialog title="发起扣税" :visible.sync="dialogFormVisible" @close="handleCancel('payForm')">
       <el-form ref="payForm" :model="payForm" label-width="96px" :disabled="submitting" :rules="rules">
         <el-form-item label="付款账号" prop="pyerac">
-          <el-input type="text" v-model="payForm.pyerac" v-on:keyup.enter.native="handleGetAccountName(payForm.pyerac)"></el-input>
+          <el-input type="text" v-model="payForm.pyerac" v-on:keyup.enter.native="handleGetAccountName(payForm.pyerac)" v-on:change="handleGetAccountName(payForm.pyerac)"></el-input>
         </el-form-item>
         <el-form-item label="账号名称" prop="accountName">
           <el-input type="text" v-model="payForm.accountName" disabled></el-input>
@@ -134,7 +134,6 @@ export default {
         if(code==200){
           this.payForm.accountName=accountName
         }else if(code==202){
-          this.payForm.pyerac=""
           this.payForm.accountName=""
           this.$message.error("请输入正确的账号")
         }else{
@@ -142,7 +141,7 @@ export default {
         }
       })
     },
-    handleGetName(taxcode){
+    handleGetTaxName(taxcode){
       if(taxcode==""){
         this.form.txname=""
         return false;
@@ -158,10 +157,8 @@ export default {
           this.form.txname=collectingOfficeName
         }else if(code==204){
           this.$message.error("请输入正确的机关代码")
-          this.form.collectingoffice=""
           this.form.txname=""
         }else{
-          this.form.collectingoffice=""
           this.form.txname=""
           this.$message.error(code+" "+msg)
         }

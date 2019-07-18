@@ -7,13 +7,13 @@
         </div>
         <el-form ref="form" :inline="true" size="medium" :model="form" label-width="110px" :rules="formRules">
           <el-form-item label="征收机关代码" prop="collectingoffice">
-            <el-input v-model="form.collectingoffice"  v-on:keyup.enter.native="handleGetName(form.collectingoffice)"></el-input>
+            <el-input v-model="form.collectingoffice"  v-on:keyup.enter.native="handleGetName(form.collectingoffice)"  v-on:change="handleGetName(form.collectingoffice)"></el-input>
           </el-form-item>
           <el-form-item label="纳税人编码" prop="taxpayer">
             <el-input v-model="form.taxpayer"></el-input>
           </el-form-item>
           <el-form-item label="申报序号" prop="declarationid">
-            <el-input v-model="form.declarationid"></el-input>
+            <el-input v-model="form.declarationid" v-on:keyup.enter.native="handleGetTax('form')"></el-input>
           </el-form-item>
           <el-form-item style="margin-left:20px">
             <el-button  size="medium" @click="handleGetTax('form')" type="primary">查询</el-button>
@@ -51,7 +51,7 @@
     <el-dialog title="发起扣税" :visible.sync="dialogFormVisible" @close="handleCancel('payForm')">
       <el-form ref="payForm" :model="payForm" label-width="96px" :disabled="submitting" :rules="rules">
         <el-form-item label="付款账号" prop="pyerac">
-          <el-input type="text" v-model="payForm.pyerac" v-on:keyup.enter.native="handleGetAccountName(payForm.pyerac)"></el-input>
+          <el-input type="text" v-model="payForm.pyerac" v-on:keyup.enter.native="handleGetAccountName(payForm.pyerac)" v-on:change="handleGetAccountName(payForm.pyerac)"></el-input>
         </el-form-item>
         <el-form-item label="账号名称" prop="accountName">
           <el-input type="text" v-model="payForm.accountName" disabled></el-input>
@@ -130,7 +130,7 @@ export default {
         }
       })
     },
-    handleGetName(taxcode){
+    handleGetTaxName(taxcode){
       if(taxcode==""){
         this.form.txname=""
         return false;
