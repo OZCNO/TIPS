@@ -107,7 +107,6 @@ export default {
   },
   methods: {
     handleGetAccountName(account){
-      console.log(account)
       if(account==""){
         this.payForm.accountName=""
         return false
@@ -387,8 +386,11 @@ export default {
     totalAmount(){
       let res=0
       this.list.forEach(function(item,index){
-        res+=item.taxvalue
+        // add(res,item.taxvalue)
+        res+=Math.floor(item.taxvalue*100)
       })
+      res=res / 100
+
       return res
     },
     totalCount(){

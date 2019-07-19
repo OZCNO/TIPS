@@ -9,7 +9,7 @@ module.exports = {
     proxy:{
       //当服务器遇到以/bank开头的，就会在前面加上target
       "/bank":{
-        target:"http://10.1.253.19:8090/DBServer1",
+        target:"http://10.1.120.38:56666/DBServer1",
         changeOrigin:true,//允许跨域
         secure:false,
         ws:false,
@@ -18,7 +18,7 @@ module.exports = {
         }
       },
       "/tax":{
-        target:"http://10.1.253.19:8080/TipsServer",
+        target:"http://10.1.120.38:56666/TipsServer",
         changeOrigin:true,//允许跨域
         secure:false,
         ws:false,

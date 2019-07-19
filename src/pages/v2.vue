@@ -97,7 +97,7 @@ export default {
         collectingoffice:[{ required: true, message: '不能为空', trigger: 'blur'}],
         taxpayer:[{ required: true, message: '不能为空', trigger: 'blur'}],
         declarationid:[{ required: true, message: '不能为空', trigger: 'blur'}],
-        txname:[{ required: true, message: '输入完征收机关代码后请按enter', trigger: 'blur'}]
+        txname:[{ required: true, message: '请输入正确的征收机关代码', trigger: 'blur'}]
       },
       payForm:{
         "pyerac":"",
@@ -105,7 +105,7 @@ export default {
       },
       rules:{
         pyerac:[{ required: true, message: '不能为空', trigger: 'blur'}],
-        accountName:[{ required: true, message: '输入完付款账号后请按enter', trigger: 'blur'}]
+        accountName:[{ required: true, message: '请输入正确的付款账号', trigger: 'blur'}]
       },
       listLoading:false,
       list:[],
@@ -399,8 +399,11 @@ export default {
     totalAmount(){
       let res=0
       this.list.forEach(function(item,index){
-        res+=item.taxvalue
+        // add(res,item.taxvalue)
+        res+=Math.floor(item.taxvalue*100)
       })
+      res=res / 100
+
       return res
     },
     totalCount(){
