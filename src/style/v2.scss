@@ -27,16 +27,31 @@
     .el-main{
         margin:20px auto 0;
         .box-card{
-            width:1002px;
-            .el-input__inner{
-              // width:200px;
-            }
-            .el-form--inline .el-form-item{
-                // margin-right:40px;
-            }
+            width:1000px;
             .el-table__empty-block{
                 min-height:300px;
             }
+        }
+        .successTips{
+          color:red;
+          border:3px solid red;
+          width:80px;
+          font-size:16px;
+          text-align:center;
+          line-height:20px;
+        }
+        .certificates{
+          border:1px solid #333;
+          font-size:16px;
+          line-height:30px;
+          padding:10px;
+          min-height:220px;
+          .row-th{
+            span{
+              font-weight:700;
+              text-decoration:underline;              
+            }
+          }
         }
     }
     .el-footer{

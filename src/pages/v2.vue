@@ -30,7 +30,7 @@
       </el-form>
       <br>
       <el-table :data="list" :highlight-current-row="true" v-loading="listLoading" style="width: 100%" class="tableClass" size="medium">
-        <el-table-column type="index" width="80px" label="序号">
+        <el-table-column type="index" width="60px" label="序号">
         </el-table-column><el-table-column prop="proofid" label="明细序号" sortable show-overflow-tooltip>
         </el-table-column><el-table-column prop="prooftype" label="凭证种类" sortable show-overflow-tooltip>
         </el-table-column><el-table-column prop="project" label="征收项目" sortable>
@@ -53,9 +53,8 @@
           <el-button  @click="handleSubmit" size="medium" type="primary">缴 税</el-button>
         </el-form-item>
       </el-form>
-      <!-- <el-col :span="24" class="toolbar">
-      </el-col> -->
     </el-card>
+<!--  -->
     <el-dialog title="发起扣税" :visible.sync="dialogFormVisible" @close="handleCancel('payForm')">
       <el-form ref="payForm" :model="payForm" label-width="96px" :disabled="submitting" :rules="rules">
         <el-form-item label="付款账号" prop="pyerac">
@@ -74,6 +73,39 @@
           <el-button @click="submitForm('payForm')" :loading="submitting" type="primary">确定</el-button>
       </div>
     </el-dialog>
+<!--  -->
+    <el-dialog title="广州银行银行端缴税凭证" :visible.sync="centerDialogVisible" center @close="resetAll">
+      <el-row :span="24" style="fontSize:16px;marginBottom:15px;">
+        <el-col :span='11'>缴税日期：<span>{{certificatesForm.date}}</span></el-col>
+        <el-col :span='10'>流水号：<span>{{certificatesForm.num}}</span></el-col>
+        <el-col :span="3">
+          <div class="successTips">缴税成功</div>
+        </el-col>
+      </el-row>
+      <div class="certificates">
+        <div>纳税人编码：<span>{{certificatesForm.taxpayer}}</span>（申报扣税）</div>
+        <div>付款人全称：<span>{{certificatesForm.accountName}}</span></div>
+        <el-row>
+          <el-col :span='12'>付款人账号：<span>{{certificatesForm.pyerac}}</span></el-col>
+          <el-col :span='12'>征收机关名称：<span>{{certificatesForm.txname}}</span></el-col>
+        </el-row>
+        <div>小写（合计）金额：￥<span>{{certificatesForm.totalAmount}}</span></div>
+        <div>大写（合计）金额：人民币 <span>{{certificatesForm.theAmountInWords}}</span></div>
+        <br/>
+
+        <el-row class="row-th">
+          <el-col :span="9"><span>征收项目</span></el-col>
+          <el-col :span="9"><span>所属日期</span></el-col>
+          <el-col :span="6"><span>实缴金额</span></el-col>
+        </el-row>
+        <el-row v-for="item in list" :key="item.proofid">
+          <el-col :span="7"><span>{{item.project}}</span></el-col>
+          <el-col :span="11"><span>{{item.generationdate}} ~ {{item.closingdate}}</span></el-col>
+          <el-col :span="6"><span>¥{{item.taxvalue}}</span></el-col>
+        </el-row>
+        <br/>
+      </div>
+    </el-dialog>
   </el-main>
   <el-footer>
     <span>版权所有：广州银行&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 客户服务电话：96699（广东）、400-83-96699（全国）&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;地址：广州市天河区珠江东路30号广州银行大厦&nbsp;&nbsp;&nbsp;</span>
@@ -88,10 +120,10 @@ export default {
   data() {
     return {
       form:{
-          "collectingoffice":"",
-          "taxpayer":"",
-          "declarationid":"",
-          "txname":""
+        "collectingoffice":"",
+        "taxpayer":"",
+        "declarationid":"",
+        "txname":""
       },
       formRules:{
         collectingoffice:[{ required: true, message: '不能为空', trigger: 'blur'}],
@@ -115,11 +147,13 @@ export default {
       t1009:false,
       t2090:false,
       t2091:false,
+      centerDialogVisible:false,
+      theAmountInWords:"",
+      certificatesForm:{}
     }
   },
   methods: {
     handleGetAccountName(account){
-      console.log(account)
       if(account==""){
         this.payForm.accountName=""
         return false
@@ -168,7 +202,6 @@ export default {
       this.$refs[form].validate((valid) => {
         if (valid) {
           if(this.form.txname==""){
-            console.log("enter")
             this.form.txname=this.taxName
           }
           this.handleT2091()
@@ -183,8 +216,15 @@ export default {
           getList(params).then(res=>{
             let {msg,code,list}=res.data
             if(code==200){
-              this.list=list
-              this.handleT1009()
+              if(list.length<1){
+                this.t2091=false
+                this.$alert('没有需要缴纳的税款项目', '查询结果', {
+                  confirmButtonText: '确定'
+                });
+              }else{
+                this.list=list
+                this.handleT1009()
+              }
             }else{
               this.$message.error(msg)
             }
@@ -231,7 +271,6 @@ export default {
         taxStatus(params).then(res=>{
           let {msg,code,data}=res.data
           if(code==200){
-            this.submitting=false
             this.handleT1008()
 
             // if(this.t1008){
@@ -254,12 +293,11 @@ export default {
       })
     },
     handleT2091(){
-      let date=new Date();
       let s2091={
         "data":{
           "protoId": "2091", //4个id
           "data":{
-            "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
+            "fcbpdt": this.getDate(),
             "fcbpsq": "",//流水
             "tipssq": this.form.declarationid,//申报序号
             "tranam": "",//金额
@@ -287,12 +325,11 @@ export default {
       // })
     },
     handleT1009(){
-      let date=new Date()
       let s1009={
         "data":{
           "protoId": "1009", //4个id
           "data":{
-            "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
+            "fcbpdt": this.getDate(),
             "fcbpsq": "",
             "tipssq": this.form.declarationid,
             "tranam": this.totalAmount,
@@ -315,12 +352,11 @@ export default {
       })
     },
     handleT2090(){
-      let date=new Date();
       let s2090={
         "data":{
           "protoId": "2090", //4个id
           "data":{
-            "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
+            "fcbpdt": this.getDate(),
             "fcbpsq": "",
             "tipssq": this.form.declarationid,
             "tranam": this.totalAmount,
@@ -343,12 +379,11 @@ export default {
       })
     },
     handleT1008(){
-      let date=new Date();
       let s1008={
         "data":{
           "protoId": "1008", //4个id
           "data":{
-            "fcbpdt": date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
+            "fcbpdt": this.getDate(),
             "fcbpsq": "",
             "tipssq": this.form.declarationid,
             "tranam": this.totalAmount,
@@ -366,49 +401,88 @@ export default {
         }
       }
       save(s1008).then(res=>{
-        let {code,msg,data}=res.data
+        let {code,msg,serialNum}=res.data
         if(code==200){
           this.t1008=true
           console.log("1008数据库记录成功")
 
-          if(this.t1008){
-            this.$message.success("缴税成功")
-            this.resetForm("form")
-            this.resetForm("payForm")
+          // if(this.t1008){
             this.dialogFormVisible = false
-            this.list=[]
-            this.t1008=false
-            this.t1009=false
-            this.t2090=false
-            this.t2091=false
-          }
+            this.submitting=false
+            this.centerDialogVisible=true
 
+            this.certificatesForm.date=this.getDate()
+            this.certificatesForm.num=serialNum//流水号
+            this.certificatesForm.taxpayer=this.form.taxpayer
+            this.certificatesForm.accountName=this.payForm.accountName
+            this.certificatesForm.pyerac=this.payForm.pyerac
+            this.certificatesForm.txname=this.form.txname
+            this.certificatesForm.totalAmount=this.totalAmount
+            this.certificatesForm.theAmountInWords=this.digitUppercase(this.totalAmount)
+
+          // }
         }else{
           this.t1008=false
           this.$message.error("出错了")
         }
       })
     },
+    resetAll(){
+      this.resetForm("form")
+      this.resetForm("payForm")
+      this.list=[]
+      this.t1008=false
+      this.t1009=false
+      this.t2090=false
+      this.t2091=false
+    },
+    digitUppercase(n){
+      let fraction = ['角', '分']
+      let digit = ['零', '壹', '贰', '叁', '肆','伍', '陆', '柒', '捌', '玖'];
+      let unit = [ ['元', '万', '亿'] , ['', '拾', '佰', '仟'] ];
+      let head = n < 0 ? '欠' : ''
+      n = Math.abs(n)
+      let s = ''
+      for (let i = 0; i < fraction.length; i++) {
+        s += (digit[Math.floor(Math.floor(n * 1000 * 10 * Math.pow(10, i)) % (10 * 1000) / 1000)] + fraction[i]).replace(/零./, '')
+      }
+      s = s || '整'
+      n = Math.floor(n)
+      for (let i = 0; i < unit[0].length && n > 0; i++) {
+        let p = ''
+        for (let j = 0; j < unit[1].length && n > 0; j++) {
+          p = digit[n % 10] + unit[1][j] + p
+          n = Math.floor(n / 10)
+        }
+        s = p.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + s
+      }
+      return head + s.replace(/(零.)*零元/, '元').replace(/(零.)+/g, '零').replace(/^整$/, '零元整')
+    },
+    getDate(){
+      let now=new Date()
+      let year=now.getFullYear()
+      let month=now.getMonth()+1
+      let day=now.getDate()
+      if(month<10){
+        month="0"+month;
+      }
+      return year+month+day;
+    }
   },
   computed:{
-    // getName(){
-    //   let p=this.form.collectingOffice
-    //   let res=this.handleGetName(p)
-    //   return res
-    // },
     totalAmount(){
       let res=0
       this.list.forEach(function(item,index){
-        // add(res,item.taxvalue)
-        res+=Math.floor(item.taxvalue*100)
+        res+=item.taxvalue*100
       })
-      res=res / 100
+      res=(res / 100).toFixed(2)
 
       return res
     },
     totalCount(){
       return this.list.length;
     },
+
   }
 }
 </script>
